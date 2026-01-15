@@ -4,6 +4,11 @@
   functions = "netlify/functions"
 
 [[redirects]]
+  from = "/api/verify-password"
+  to = "/.netlify/functions/verify-password"
+  status = 200
+
+[[redirects]]
   from = "/api/create-project"
   to = "/.netlify/functions/create-project"
   status = 200
