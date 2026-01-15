@@ -4,8 +4,23 @@
   functions = "netlify/functions"
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  from = "/api/create-project"
+  to = "/.netlify/functions/create-project"
+  status = 200
+
+[[redirects]]
+  from = "/api/projects/:slug"
+  to = "/.netlify/functions/get-project/:slug"
+  status = 200
+
+[[redirects]]
+  from = "/api/slots/:slotId/book"
+  to = "/.netlify/functions/book-slot/:slotId"
+  status = 200
+
+[[redirects]]
+  from = "/api/projects/:slug/admin"
+  to = "/.netlify/functions/get-admin/:slug"
   status = 200
 
 [[redirects]]

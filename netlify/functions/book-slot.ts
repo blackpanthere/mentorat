@@ -23,7 +23,10 @@ export const handler: Handler = async (event) => {
     }
 
     try {
-        const slotId = event.path.split('/')[3]; // /api/slots/:slotId/book
+        // Extract slotId from path: /api/book-slot/uuid-here
+        const pathParts = event.path.split('/');
+        const slotId = pathParts[pathParts.length - 1];
+
         const body = JSON.parse(event.body || '{}');
         const { participant_name, participant_project_name, participant_email, participant_phone } = body;
 

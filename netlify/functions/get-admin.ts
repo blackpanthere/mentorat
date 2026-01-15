@@ -23,7 +23,9 @@ export const handler: Handler = async (event) => {
     }
 
     try {
-        const slug = event.path.split('/')[3]; // /api/projects/:slug/admin
+        // Extract slug from path: /api/get-admin/abc123
+        const pathParts = event.path.split('/');
+        const slug = pathParts[pathParts.length - 1];
         const token = event.queryStringParameters?.token;
 
         if (!slug || !token) {

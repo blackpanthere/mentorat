@@ -23,7 +23,9 @@ export const handler: Handler = async (event) => {
     }
 
     try {
-        const slug = event.path.split('/').pop();
+        // Extract slug from path: /api/get-project/abc123
+        const pathParts = event.path.split('/');
+        const slug = pathParts[pathParts.length - 1];
 
         if (!slug) {
             return {
