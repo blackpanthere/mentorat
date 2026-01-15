@@ -23,9 +23,23 @@ export const handler: Handler = async (event) => {
     }
 
     try {
-        // Extract slotId from path: /api/book-slot/uuid-here
-        const pathParts = event.path.split('/');
-        const slotId = pathParts[pathParts.length - 1];
+        // Extract slotId from path
+        // Path can be: /.netlify/functions/book-slot/uuid or /api/slots/uuid/book
+        const pathParts = event.path.split('/').filter(p => p);
+
+        // Find the UUID - it's either the last part or the one before 'book'
+        let slotId;
+        const bookIndex = pathParts.indexOf('book');
+        if (bookIndex > 0) {
+            // Path is like /api/slots/uuid/book
+            slotId = pathParts[bookIndex - 1];
+        } else {
+            // Path is like /.netlify/functions/book-slot/uuid
+            slotId = pathParts[pathParts.length - 1];
+        }
+
+        console.log('Book slot - Path:', event.path);
+        console.log('Book slot - SlotId extracted:', slotId);
 
         const body = JSON.parse(event.body || '{}');
         const { participant_name, participant_project_name, participant_email, participant_phone } = body;
@@ -104,11 +118,11 @@ export const handler: Handler = async (event) => {
             // Create booking
             const [booking] = await sql`
         INSERT INTO bookings (
-          slot_id,
-          project_id,
-          participant_name,
-          participant_project_name,
-          participant_email,
+          slot_id, 
+          project_id, 
+          participant_name, 
+          participant_project_name, 
+          participant_email, 
           participant_phone
         )
         VALUES (
