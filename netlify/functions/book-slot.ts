@@ -82,41 +82,33 @@ export const handler: Handler = async (event) => {
             };
         }
 
-        // Use transaction to prevent race conditions
+        // Check if slot is still available
+        if (slot.status !== 'available') {
+            return {
+                statusCode: 409,
+                headers,
+                body: JSON.stringify({
+                    message: 'Ce créneau vient d\'être réservé. Veuillez en choisir un autre.'
+                }),
+            };
+        }
+
+        // Update slot status and create booking
         try {
-            // Lock the slot row and check availability
-            const [lockedSlot] = await sql`
-        SELECT id, status
-        FROM slots
-        WHERE id = ${slotId}
-        FOR UPDATE
-      `;
-
-            if (lockedSlot.status !== 'available') {
-                return {
-                    statusCode: 409,
-                    headers,
-                    body: JSON.stringify({
-                        message: 'Ce créneau vient d\'être réservé. Veuillez en choisir un autre.'
-                    }),
-                };
-            }
-
-            // Update slot status
             await sql`
         UPDATE slots
         SET status = 'booked'
-        WHERE id = ${slotId}
+        WHERE id = ${slotId} AND status = 'available'
       `;
 
             // Create booking
             const [booking] = await sql`
         INSERT INTO bookings (
-          slot_id, 
-          project_id, 
-          participant_name, 
-          participant_project_name, 
-          participant_email, 
+          slot_id,
+          project_id,
+          participant_name,
+          participant_project_name,
+          participant_email,
           participant_phone
         )
         VALUES (
@@ -139,9 +131,19 @@ export const handler: Handler = async (event) => {
                     message: 'Booking successful',
                 }),
             };
-        } catch (txError) {
-            console.error('Transaction error:', txError);
-            throw txError;
+        } catch (dbError) {
+            console.error('Database error:', dbError);
+            // If it's a unique constraint violation, it means duplicate booking
+            if (dbError instanceof Error && dbError.message.includes('unique')) {
+                return {
+                    statusCode: 400,
+                    headers,
+                    body: JSON.stringify({
+                        message: 'Vous avez déjà réservé un créneau pour cette session de mentorat.'
+                    }),
+                };
+            }
+            throw dbError;
         }
     } catch (error) {
         console.error('Error booking slot:', error);
