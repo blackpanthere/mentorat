@@ -23,36 +23,60 @@ export const handler: Handler = async (event) => {
     }
 
     try {
-        // Extract slug from path: /api/get-admin/abc123 or /.netlify/functions/get-admin/abc123
+        // Extract slug from path - find it after 'get-admin' or 'admin'
         const pathParts = event.path.split('/').filter(p => p);
-        const slug = pathParts[pathParts.length - 1];
+
+        let slug;
+        const adminIndex = pathParts.findIndex(p => p === 'get-admin' || p === 'admin');
+        if (adminIndex >= 0 && adminIndex < pathParts.length - 1) {
+            slug = pathParts[adminIndex + 1];
+        } else {
+            // Fallback: take last segment
+            slug = pathParts[pathParts.length - 1];
+        }
+
         const token = event.queryStringParameters?.token;
 
-        console.log('Admin request - Path:', event.path);
-        console.log('Admin request - Slug extracted:', slug);
-        console.log('Admin request - Token received:', token ? 'Yes' : 'No');
+        console.log('=== ADMIN REQUEST DEBUG ===');
+        console.log('Full path:', event.path);
+        console.log('Path parts:', pathParts);
+        console.log('Admin index:', adminIndex);
+        console.log('Slug extracted:', slug);
+        console.log('Token received:', token ? `${token.substring(0, 10)}...` : 'NONE');
+        console.log('Query params:', event.queryStringParameters);
 
         if (!slug || !token) {
+            console.log('ERROR: Missing slug or token');
             return {
                 statusCode: 400,
                 headers,
                 body: JSON.stringify({
                     message: 'Missing slug or token',
-                    debug: { slug, hasToken: !!token, path: event.path }
+                    debug: {
+                        slug,
+                        hasToken: !!token,
+                        path: event.path,
+                        pathParts
+                    }
                 }),
             };
         }
 
         // Verify admin token
         const [project] = await sql`
-      SELECT id, title, description, organizer_name, organizer_email, created_at, admin_token
-      FROM projects
-      WHERE public_slug = ${slug}
-    `;
+            SELECT id, title, description, organizer_name, organizer_email, created_at, admin_token
+            FROM projects
+            WHERE public_slug = ${slug}
+        `;
 
-        console.log('Project found:', project ? 'Yes' : 'No');
+        console.log('Project found:', project ? 'YES' : 'NO');
+        if (project) {
+            console.log('Project ID:', project.id);
+            console.log('Project title:', project.title);
+        }
 
         if (!project) {
+            console.log('ERROR: Project not found for slug:', slug);
             return {
                 statusCode: 404,
                 headers,
@@ -61,9 +85,16 @@ export const handler: Handler = async (event) => {
         }
 
         // Check token separately for better debugging
-        if (project.admin_token !== token) {
-            console.log('Token mismatch - Expected:', project.admin_token.substring(0, 10) + '...');
-            console.log('Token mismatch - Received:', token.substring(0, 10) + '...');
+        const tokenMatch = project.admin_token === token;
+        console.log('Token comparison:');
+        console.log('  Expected (first 10):', project.admin_token.substring(0, 10));
+        console.log('  Received (first 10):', token.substring(0, 10));
+        console.log('  Match:', tokenMatch ? 'YES' : 'NO');
+        console.log('  Expected length:', project.admin_token.length);
+        console.log('  Received length:', token.length);
+
+        if (!tokenMatch) {
+            console.log('ERROR: Token mismatch');
             return {
                 statusCode: 403,
                 headers,
@@ -71,10 +102,10 @@ export const handler: Handler = async (event) => {
             };
         }
 
+        console.log('SUCCESS: Authentication passed');
+
         // Get all slots with booking information
         const slots = await sql`
-      SELECT
-        s.id,
         s.project_id,
         s.start_datetime,
         s.duration_minutes,
