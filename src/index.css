@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-oc-orange: #FF6B35;
+  --color-oc-dark: #2D3142;
+  --color-oc-gray: #4F5D75;
+  --color-oc-light: #F8F9FA;
+
+  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family-sans);
+  background-color: var(--color-oc-light);
+  color: var(--color-oc-dark);
+  line-height: 1.6;
+}
+
+.btn-primary {
+  @apply bg-oc-orange text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg active:scale-95;
+}
+
+.btn-primary:hover {
+  background-color: #e55f2f;
+}
+
+.btn-secondary {
+  @apply bg-white text-oc-dark px-6 py-3 rounded-lg font-medium border-2 border-oc-gray hover:bg-gray-50 transition-all duration-200 active:scale-95;
+}
+
+.card {
+  @apply bg-white rounded-xl shadow-md p-6 transition-all duration-200 hover:shadow-lg;
+}
+
+.input-field {
+  @apply w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-oc-orange focus:outline-none transition-colors duration-200;
+}
+
+.label {
+  @apply block text-sm font-medium text-oc-dark mb-2;
+}
+
+.glass {
+  @apply bg-white backdrop-blur-md;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.gradient-orange {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C61 100%);
+}
