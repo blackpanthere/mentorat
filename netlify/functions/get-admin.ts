@@ -23,28 +23,47 @@ export const handler: Handler = async (event) => {
     }
 
     try {
-        // Extract slug from path: /api/get-admin/abc123
-        const pathParts = event.path.split('/');
+        // Extract slug from path: /api/get-admin/abc123 or /.netlify/functions/get-admin/abc123
+        const pathParts = event.path.split('/').filter(p => p);
         const slug = pathParts[pathParts.length - 1];
         const token = event.queryStringParameters?.token;
+
+        console.log('Admin request - Path:', event.path);
+        console.log('Admin request - Slug extracted:', slug);
+        console.log('Admin request - Token received:', token ? 'Yes' : 'No');
 
         if (!slug || !token) {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ message: 'Missing slug or token' }),
+                body: JSON.stringify({
+                    message: 'Missing slug or token',
+                    debug: { slug, hasToken: !!token, path: event.path }
+                }),
             };
         }
 
         // Verify admin token
         const [project] = await sql`
-      SELECT id, title, description, organizer_name, organizer_email, created_at
+      SELECT id, title, description, organizer_name, organizer_email, created_at, admin_token
       FROM projects
       WHERE public_slug = ${slug}
-      AND admin_token = ${token}
     `;
 
+        console.log('Project found:', project ? 'Yes' : 'No');
+
         if (!project) {
+            return {
+                statusCode: 404,
+                headers,
+                body: JSON.stringify({ message: 'Project not found' }),
+            };
+        }
+
+        // Check token separately for better debugging
+        if (project.admin_token !== token) {
+            console.log('Token mismatch - Expected:', project.admin_token.substring(0, 10) + '...');
+            console.log('Token mismatch - Received:', token.substring(0, 10) + '...');
             return {
                 statusCode: 403,
                 headers,
@@ -54,7 +73,7 @@ export const handler: Handler = async (event) => {
 
         // Get all slots with booking information
         const slots = await sql`
-      SELECT 
+      SELECT
         s.id,
         s.project_id,
         s.start_datetime,
@@ -104,7 +123,14 @@ export const handler: Handler = async (event) => {
             statusCode: 200,
             headers,
             body: JSON.stringify({
-                project,
+                project: {
+                    id: project.id,
+                    title: project.title,
+                    description: project.description,
+                    organizer_name: project.organizer_name,
+                    organizer_email: project.organizer_email,
+                    created_at: project.created_at,
+                },
                 slots: slotsWithBookings,
                 stats: {
                     total_slots,
