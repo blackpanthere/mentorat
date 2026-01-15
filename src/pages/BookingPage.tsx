@@ -216,55 +216,67 @@ const BookingPage: React.FC = () => {
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="label">Nom & Prénom *</label>
+                                <label htmlFor="participant_name" className="label">Votre nom *</label>
                                 <input
+                                    id="participant_name"
+                                    name="participant_name"
                                     type="text"
                                     value={formData.participant_name}
                                     onChange={(e) => setFormData({ ...formData, participant_name: e.target.value })}
                                     className="input-field"
-                                    placeholder="Jean Dupont"
-                                />
-                                {errors.participant_name && (
+                                    placeholder="Ex: Jean Dupont"
+                                    required
+                                    autoComplete="name"
+                                />{errors.participant_name && (
                                     <p className="text-red-500 text-sm mt-1">{errors.participant_name}</p>
                                 )}
                             </div>
 
                             <div>
-                                <label className="label">Nom du projet / startup *</label>
+                                <label htmlFor="participant_project_name" className="label">Nom de votre projet/startup *</label>
                                 <input
+                                    id="participant_project_name"
+                                    name="participant_project_name"
                                     type="text"
                                     value={formData.participant_project_name}
                                     onChange={(e) => setFormData({ ...formData, participant_project_name: e.target.value })}
                                     className="input-field"
-                                    placeholder="Mon Projet"
-                                />
-                                {errors.participant_project_name && (
+                                    placeholder="Ex: Mon Startup"
+                                    required
+                                    autoComplete="organization"
+                                />{errors.participant_project_name && (
                                     <p className="text-red-500 text-sm mt-1">{errors.participant_project_name}</p>
                                 )}
                             </div>
 
                             <div>
-                                <label className="label">Email *</label>
+                                <label htmlFor="participant_email" className="label">Email *</label>
                                 <input
+                                    id="participant_email"
+                                    name="participant_email"
                                     type="email"
                                     value={formData.participant_email}
                                     onChange={(e) => setFormData({ ...formData, participant_email: e.target.value })}
                                     className="input-field"
-                                    placeholder="jean@example.com"
-                                />
-                                {errors.participant_email && (
+                                    placeholder="votre@email.com"
+                                    required
+                                    autoComplete="email"
+                                />{errors.participant_email && (
                                     <p className="text-red-500 text-sm mt-1">{errors.participant_email}</p>
                                 )}
                             </div>
 
                             <div>
-                                <label className="label">Numéro de téléphone (optionnel)</label>
+                                <label htmlFor="participant_phone" className="label">Téléphone (optionnel)</label>
                                 <input
+                                    id="participant_phone"
+                                    name="participant_phone"
                                     type="tel"
                                     value={formData.participant_phone}
                                     onChange={(e) => setFormData({ ...formData, participant_phone: e.target.value })}
                                     className="input-field"
                                     placeholder="+33 6 12 34 56 78"
+                                    autoComplete="tel"
                                 />
                             </div>
 

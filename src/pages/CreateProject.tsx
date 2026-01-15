@@ -210,49 +210,61 @@ const CreateProject: React.FC = () => {
 
                         <div className="space-y-4">
                             <div>
-                                <label className="label">Titre du projet *</label>
+                                <label htmlFor="project_title" className="label">Titre du projet *</label>
                                 <input
+                                    id="project_title"
+                                    name="project_title"
                                     type="text"
                                     value={formData.title}
                                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                     className="input-field"
                                     placeholder="Ex: Mentorat Orange Corners – Batch 3"
+                                    autoComplete="off"
                                 />
                                 {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
                             </div>
 
                             <div>
-                                <label className="label">Description (optionnelle)</label>
+                                <label htmlFor="project_description" className="label">Description (optionnelle)</label>
                                 <textarea
+                                    id="project_description"
+                                    name="project_description"
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     className="input-field"
                                     rows={3}
                                     placeholder="Décrivez brièvement cette session de mentorat..."
+                                    autoComplete="off"
                                 />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="label">Nom de l'organisateur *</label>
+                                    <label htmlFor="organizer_name" className="label">Nom de l'organisateur *</label>
                                     <input
+                                        id="organizer_name"
+                                        name="organizer_name"
                                         type="text"
                                         value={formData.organizer_name}
                                         onChange={(e) => setFormData({ ...formData, organizer_name: e.target.value })}
                                         className="input-field"
                                         placeholder="Votre nom"
+                                        autoComplete="name"
                                     />
                                     {errors.organizer_name && <p className="text-red-500 text-sm mt-1">{errors.organizer_name}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="label">Email de contact *</label>
+                                    <label htmlFor="organizer_email" className="label">Email de contact *</label>
                                     <input
+                                        id="organizer_email"
+                                        name="organizer_email"
                                         type="email"
                                         value={formData.organizer_email}
                                         onChange={(e) => setFormData({ ...formData, organizer_email: e.target.value })}
                                         className="input-field"
                                         placeholder="votre@email.com"
+                                        autoComplete="email"
                                     />
                                     {errors.organizer_email && <p className="text-red-500 text-sm mt-1">{errors.organizer_email}</p>}
                                 </div>

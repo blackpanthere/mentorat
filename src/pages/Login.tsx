@@ -57,8 +57,10 @@ const Login: React.FC = () => {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <label className="label">Mot de passe</label>
+                            <label htmlFor="password" className="label">Mot de passe</label>
                             <input
+                                id="password"
+                                name="password"
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -66,6 +68,7 @@ const Login: React.FC = () => {
                                 placeholder="Entrez le mot de passe"
                                 required
                                 autoFocus
+                                autoComplete="current-password"
                             />
                             {error && (
                                 <p className="text-red-500 text-sm mt-2">{error}</p>
